@@ -37,7 +37,7 @@ def get_response(
     payload = {"model": model, "messages": messages, "stream": True}
 
     response = requests.post(
-        f"{ollama_url}/api/chat", json=payload, stream=True, timeout=90
+        f"{ollama_url}/api/chat", json=payload, stream=True, timeout=300
     )
     response.raise_for_status()
 
