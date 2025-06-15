@@ -21,7 +21,7 @@ make sure you mention which option you choose from the above (a, b, c), along wi
 
 The functions mentioned in choice (b) will be provided in code blocks like so:
 
-```function
+```function_spec
 the function specification, in json or yaml format.
 ```
 

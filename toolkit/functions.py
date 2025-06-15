@@ -73,7 +73,7 @@ def register(spec: FunctionSpec, func: Callable) -> None:
 
 def specify() -> str:
     return "\n".join([
-        f"```function\n{json.dumps(x["spec"], indent=2)}\n```\n"
+        f"```function_spec\n{json.dumps(x["spec"], indent=2)}\n```\n"
         for x in functions.values()
     ])
 
