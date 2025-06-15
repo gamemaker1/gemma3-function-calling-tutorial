@@ -2,9 +2,7 @@
 
 > This repository contains the source code for the tutorial on function calling with Gemma 3.
 
-The tutorial is a single Python Notebook, [`tutorial.ipynb`](tutorial.ipynb). It uses helper functions from the [`toolkit`](toolkit/).
-
-The best way to learn is to do: please follow the below instructions on getting started so you can change, run and experiment with the code in the notebook as you read.
+The tutorial is a single Python Notebook, [`tutorial.ipynb`](tutorial.ipynb). It uses helper functions from the [`toolkit`](toolkit/). The best way to learn is to do: please follow the below instructions on getting started so you can change, run and experiment with the code in the notebook as you read.
 
 ### Getting Started
 
