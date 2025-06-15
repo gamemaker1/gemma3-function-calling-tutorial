@@ -65,7 +65,7 @@ code_block_regex = r"""
 functions = {}
 
 
-def register(spec: FunctionSpec, func: Callable) -> None:
+def register(func: Callable, spec: FunctionSpec) -> None:
     functions[spec["name"]] = {"spec": spec, "func": func}
 
 
