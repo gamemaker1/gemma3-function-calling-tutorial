@@ -1,3 +1,3 @@
-from . import functions
-from . import model
-from . import prompts
+from . import functions as functions
+from . import model as model
+from . import prompts as prompts
