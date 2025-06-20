@@ -5,6 +5,8 @@ and calls, and handle the execution lifecycle of the actual functions.
 
 import re
 import json
+import asyncio
+import inspect
 
 from typing import TypedDict
 from collections.abc import Callable
@@ -72,10 +74,32 @@ def register(func: Callable, spec: FunctionSpec) -> None:
 def specify() -> str:
     return "\n".join(
         [
-            f"```function_spec\n{json.dumps(x['spec'], indent=2)}\n```\n"
+            f"```function_spec\n{json.dumps(x['spec'], indent=4)}\n```\n"
             for x in functions.values()
         ]
     )
+
+
+def parse_funcs(message: str) -> list[str]:
+    regex = re.compile(code_block_regex, re.VERBOSE | re.DOTALL)
+
+    definitions = []
+    for match in regex.finditer(message):
+        if match.group("code_class") == "python":
+            definitions.append(match.group("code_content"))
+
+    return definitions
+
+
+def parse_specs(message: str) -> list[FunctionSpec]:
+    regex = re.compile(code_block_regex, re.VERBOSE | re.DOTALL)
+
+    specifications = []
+    for match in regex.finditer(message):
+        if match.group("code_class") == "function_spec":
+            specifications.append(json.loads(match.group("code_content")))
+
+    return specifications
 
 
 def parse_calls(message: str) -> list[FunctionCall]:
@@ -89,20 +113,28 @@ def parse_calls(message: str) -> list[FunctionCall]:
     return invocations
 
 
-def execute_call(invocation: FunctionCall, respond: Callable[[str], None]) -> None:
+async def execute_call(invocation: FunctionCall) -> str:
     name, args = invocation["function"], invocation["parameters"]
+    func = functions[name]["func"]
 
     try:
-        result = functions[name]["func"](**args)
+        result = (
+            await func(**args) if inspect.iscoroutinefunction(func) else func(**args)
+        )
         response = json.dumps({"id": invocation["id"], "result": result}, indent=4)
 
     except Exception as error:
-        response = json.dumps(
-            {
-                "id": invocation["id"],
-                "error": {"name": type(error).__name__, "message": str(error)},
-            },
-            indent=4,
-        )
+        error = {"name": type(error).__name__, "message": str(error)}
+        response = json.dumps({"id": invocation["id"], "error": error}, indent=4)
 
-    respond(f"```function_output\n{response}\n```")
+    return f"```function_output\n{response}\n```\n"
+
+
+async def execute_calls(invocations: list[FunctionCall]) -> str:
+    tasks = [asyncio.create_task(execute_call(inv)) for inv in invocations]
+    results = []
+
+    for task in asyncio.as_completed(tasks):
+        results.append(await task)
+
+    return "\n".join(results)

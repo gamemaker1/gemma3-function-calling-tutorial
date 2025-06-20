@@ -6,6 +6,7 @@ import json
 
 from textwrap import dedent
 from microsandbox import PythonSandbox
+from collections.abc import Callable
 
 sandbox = None
 context = None
@@ -29,12 +30,27 @@ async def cleanup_sandbox():
         context = None
 
 
-async def define_function(code: str):
-    exec = await sandbox.run(code)
-    await exec.output()
+async def define_function(name: str, code: str) -> Callable:
+    if not sandbox:
+        raise Exception("Call `create_sandbox()` first, and `cleanup_sandbox()` after.")
+
+    runner = await sandbox.run(code)
+    errors = await runner.error()
+
+    if errors:
+        print("Caught errors during definition:", errors)
+        raise Exception(f"Function definition produced runtime errors: {errors}")
+
+    async def sandboxed_function(**kwargs):
+        return await execute_function(name, kwargs)
+
+    return sandboxed_function
 
 
 async def execute_function(name: str, params: dict) -> dict:
+    if not sandbox:
+        raise Exception("Call `create_sandbox()` first, and `cleanup_sandbox()` after.")
+
     args = ", ".join([f"{key}={repr(val)}" for key, val in params.items()])
     code = dedent(f"""
         import json
