@@ -34,7 +34,16 @@ def get_response(
         else message
         for message in messages
     ]
-    payload = {"model": model, "messages": messages, "stream": True}
+
+    payload = {
+        "model": model,
+        "messages": messages,
+        "stream": True,
+        "options": {
+            "num_ctx": 8192,
+            "top_p": 0.95,
+        },
+    }
 
     response = requests.post(
         f"{ollama_url}/api/chat", json=payload, stream=True, timeout=300
