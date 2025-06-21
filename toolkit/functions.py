@@ -118,10 +118,12 @@ async def execute_call(invocation: FunctionCall) -> str:
     func = functions[name]["func"]
 
     try:
-        result = (
-            await func(**args) if inspect.iscoroutinefunction(func) else func(**args)
-        )
-        response = json.dumps({"id": invocation["id"], "result": result}, indent=4)
+        if inspect.iscoroutinefunction(func):
+            output = await func(**args)
+        else:
+            output = {"result": func(**args)}
+
+        response = json.dumps({"id": invocation["id"], **output}, indent=4)
 
     except Exception as error:
         error = {"name": type(error).__name__, "message": str(error)}
