@@ -53,4 +53,10 @@ Please note that the order in which functions execute is NOT guaranteed. If all 
 
 Ensure your final response fully addresses my request, and is helpful to me.
 
-Please preface all your responses with a special code block labelled `thinking` that include your thoughts, observations and justification for actions that you are taking. Include the guidelines you have followed and not followed while producing your response as well.
+Please preface all your responses with a special code block labelled `thinking` that includes your thoughts, observations, and justification for the actions you are taking, like so:
+
+```thinking
+your thoughts go here...
+```
+
+Include the considerations you made about the information required, the relevant functions, and any dependencies between functions.
